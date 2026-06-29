@@ -1,7 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
-import { getApp } from 'firebase/app';
-import { getId, getInstallations } from 'firebase/installations';
 import { useQuery } from '@tanstack/react-query';
 import { apiFeatureFlagsGet } from '@services/api/app';
 import { apiHostState, featureFlagsState, isOnlineState } from '@states/app';
@@ -51,15 +49,11 @@ const useFeatureFlags = () => {
 
       if (import.meta.env.VITE_BACKEND_API) {
         tmpHost = import.meta.env.VITE_BACKEND_API;
+      } else if (import.meta.env.VITE_API_HOST) {
+        tmpHost = import.meta.env.VITE_API_HOST;
       } else {
-        if (
-          import.meta.env.DEV ||
-          window.location.host.indexOf('localhost') !== -1
-        ) {
-          tmpHost = 'http://localhost:8000/';
-        } else {
-          tmpHost = 'https://api.organized-app.com/';
-        }
+        // Default: same-origin under /organized/ prefix
+        tmpHost = '/organized';
       }
 
       setApiHost(tmpHost);
@@ -74,16 +68,11 @@ const useFeatureFlags = () => {
   useEffect(() => {
     const handleLoading = async () => {
       try {
-        const app = getApp();
-
-        let id: string;
-
-        if (import.meta.env.VITE_FIREBASE_AUTH_EMULATOR_HOST) {
-          id = 'ad00115e-46da-476c-a7bf-d160b4eaa1e6';
-        } else {
-          const installations = getInstallations(app);
-
-          id = await getId(installations);
+        // Use a stable local installation ID (no Firebase dependency)
+        let id = localStorage.getItem('organized_installation_id');
+        if (!id) {
+          id = crypto.randomUUID();
+          localStorage.setItem('organized_installation_id', id);
         }
 
         setInstallationId(id);

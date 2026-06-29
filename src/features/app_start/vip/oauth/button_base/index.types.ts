@@ -1,10 +1,9 @@
 import { ReactElement } from 'react';
-import { AuthProvider } from 'firebase/auth';
 
 export type OAuthButtonBaseProps = {
   logo: ReactElement;
   text: string;
-  provider?: AuthProvider;
+  provider?: unknown;
 };
 
 export type NextStepType = {

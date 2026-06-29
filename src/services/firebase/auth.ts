@@ -1,54 +1,45 @@
-import {
-  AuthProvider,
-  GithubAuthProvider,
-  GoogleAuthProvider,
-  OAuthProvider,
-  getAuth,
-  indexedDBLocalPersistence,
-  setPersistence,
-  signInWithCustomToken,
-  signInWithPopup,
-  signOut,
-} from 'firebase/auth';
+/**
+ * Local auth stub — replaces Firebase Auth.
+ *
+ * All functions that previously depended on firebase/auth now use
+ * cookie-based sessions. These stubs keep existing import paths
+ * working while the migration is in progress.
+ */
 
 export const userSignOut = async () => {
-  const auth = await getAuth();
-  if (auth) {
-    await signOut(auth);
+  const apiHost = import.meta.env.VITE_API_HOST || '/organized';
+  try {
+    await fetch(`${apiHost}/api/v3/users/logout`, {
+      credentials: 'include',
+    });
+  } catch {
+    // Ignore — logout is best-effort
   }
 };
 
 export const currentAuthUser = () => {
-  const auth = getAuth();
-  const user = auth?.currentUser;
-  return user;
+  // No longer used — auth is cookie-based.
+  // Return null to indicate "no Firebase user".
+  return null;
 };
 
 export const setAuthPersistence = async () => {
-  const auth = getAuth();
-
-  await setPersistence(auth, indexedDBLocalPersistence);
+  // No-op — cookies handle persistence
 };
 
-export const userSignInCustomToken = async (code: string) => {
-  const auth = getAuth();
-  const userCredential = await signInWithCustomToken(auth, code);
-
-  return userCredential?.user;
+export const userSignInCustomToken = async (_code: string) => {
+  // No-op — custom tokens are not used in local mode
+  return null;
 };
 
-export const userSignInPopup = async (provider: AuthProvider) => {
-  const auth = getAuth();
-  const result = await signInWithPopup(auth, provider);
-
-  return result?.user;
+export const userSignInPopup = async (_provider: unknown) => {
+  // No-op — OAuth popup is not used in local mode
+  return null;
 };
 
 export const authProvider = {
-  GitHub: new GithubAuthProvider(),
-  Google: new GoogleAuthProvider(),
-  Microsoft: new OAuthProvider('microsoft.com').setCustomParameters({
-    prompt: 'consent',
-  }),
-  Yahoo: new OAuthProvider('yahoo.com'),
+  GitHub: null,
+  Google: null,
+  Microsoft: null,
+  Yahoo: null,
 };

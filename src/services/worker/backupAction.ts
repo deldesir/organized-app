@@ -114,6 +114,7 @@ const runBackup = async () => {
         const backupData = await apiGetPocketBackup({
           apiHost,
           metadata: JSON.stringify(metadata),
+          idToken,
         });
 
         const reqPayload = await dbExportDataBackup(backupData);
@@ -124,6 +125,7 @@ const runBackup = async () => {
           apiHost,
           reqPayload,
           metadata: JSON.stringify(metadataUpdate),
+          idToken,
         });
 
         if (data.message === 'UNAUTHORIZED_REQUEST') {
