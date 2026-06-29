@@ -60,9 +60,11 @@ export const apiSendCongregationBackup = async ({
 export const apiGetPocketBackup = async ({
   apiHost,
   metadata,
+  idToken,
 }: {
   apiHost: string;
   metadata: string;
+  idToken: string;
 }) => {
   const res = await fetch(`${apiHost}api/v3/pockets/backup`, {
     method: 'GET',
@@ -70,6 +72,7 @@ export const apiGetPocketBackup = async ({
     headers: {
       'Content-Type': 'application/json',
       'Cache-Control': 'no-cache',
+      Authorization: `Bearer ${idToken}`,
       appclient: 'organized',
       appversion: import.meta.env.PACKAGE_VERSION,
       metadata,
@@ -89,6 +92,12 @@ export const apiSendPocketBackup = async ({
   apiHost,
   reqPayload,
   metadata,
+  idToken,
+}: {
+  apiHost: string;
+  reqPayload: object;
+  metadata: string;
+  idToken: string;
 }) => {
   const res = await fetch(`${apiHost}api/v3/pockets/backup`, {
     method: 'POST',
@@ -96,6 +105,7 @@ export const apiSendPocketBackup = async ({
     headers: {
       'Content-Type': 'application/json',
       'Cache-Control': 'no-cache',
+      Authorization: `Bearer ${idToken}`,
       appclient: 'organized',
       appversion: import.meta.env.PACKAGE_VERSION,
       metadata,

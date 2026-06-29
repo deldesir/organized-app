@@ -6,10 +6,9 @@ import {
   userIDState,
 } from '@states/app';
 import { congIDState, congRoleState, JWLangState } from '@states/settings';
-import { currentAuthUser } from '@services/firebase/auth';
 
 export const apiDefault = async () => {
-  const apiHost = store.get(apiHostState);
+  const apiHost = store.get(apiHostState) || import.meta.env.VITE_API_HOST || '/organized';
   const appVersion = import.meta.env.PACKAGE_VERSION;
   const appLang = store.get(appLangState);
   const congID = store.get(congIDState);
@@ -18,19 +17,16 @@ export const apiDefault = async () => {
   const userID = store.get(userIDState);
   const roles = store.get(congRoleState);
 
-  const userUID = currentAuthUser()?.uid;
-  const idToken = await currentAuthUser()?.getIdToken();
-
   return {
     apiHost,
     appVersion,
-    userUID,
+    userUID: userID, // Use userID from state (set by login)
     appLang,
     congID,
     isOnline,
     JWLang,
     userID,
-    idToken,
+    idToken: '', // Cookie-based auth — no bearer token needed
     roles,
   };
 };
