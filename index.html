@@ -5,6 +5,28 @@
     <meta name="robots" content="notranslate" />
     <meta name="googlebot" content="notranslate" />
     <meta charset="utf-8" />
+    <script>
+      // Polyfill crypto.randomUUID for insecure (LAN/HTTP) contexts, where it
+      // is unavailable while crypto.getRandomValues is. Over HTTPS the native
+      // implementation is used. Without this the app crashes at boot when
+      // served over http://box.lan (the app uses randomUUID heavily).
+      if (
+        window.crypto &&
+        typeof crypto.randomUUID !== 'function' &&
+        crypto.getRandomValues
+      ) {
+        crypto.randomUUID = function () {
+          const b = crypto.getRandomValues(new Uint8Array(16));
+          b[6] = (b[6] & 0x0f) | 0x40;
+          b[8] = (b[8] & 0x3f) | 0x80;
+          const s = Array.from(b, (x) => x.toString(16).padStart(2, '0')).join('');
+          return (
+            s.slice(0, 8) + '-' + s.slice(8, 12) + '-' + s.slice(12, 16) +
+            '-' + s.slice(16, 20) + '-' + s.slice(20)
+          );
+        };
+      }
+    </script>
     <link rel="icon" href="favicon.svg" />
     <link rel="manifest" href="manifest.webmanifest" />
     <link rel="stylesheet" href="inter.css" />
