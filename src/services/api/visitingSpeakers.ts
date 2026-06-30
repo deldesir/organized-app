@@ -11,7 +11,7 @@ export const apiGetApprovedVisitingSpeakersAccess =
     } = await apiDefault();
 
     const res = await fetch(
-      `${apiHost}api/v3/congregations/meeting/${congID}/visiting-speakers/access`,
+      `${apiHost}/api/v3/congregations/meeting/${congID}/visiting-speakers/access`,
       {
         method: 'GET',
         credentials: 'include',
@@ -42,7 +42,7 @@ export const apiRequestAccessCongregationSpeakers = async (
   } = await apiDefault();
 
   const res = await fetch(
-    `${apiHost}api/v3/congregations/meeting/${congID}/visiting-speakers/request`,
+    `${apiHost}/api/v3/congregations/meeting/${congID}/visiting-speakers/request`,
     {
       method: 'POST',
       credentials: 'include',
@@ -70,7 +70,7 @@ export const apiFindCongregationSpeakers = async (name: string) => {
   } = await apiDefault();
 
   const res = await fetch(
-    `${apiHost}api/v3/congregations/meeting/${congID}/visiting-speakers/congregations?name=${name}`,
+    `${apiHost}/api/v3/congregations/meeting/${congID}/visiting-speakers/congregations?name=${name}`,
     {
       method: 'GET',
       credentials: 'include',
@@ -98,7 +98,7 @@ export const apiGetPendingVisitingSpeakersAccess =
     } = await apiDefault();
 
     const res = await fetch(
-      `${apiHost}api/v3/congregations/meeting/${congID}/visiting-speakers/pending-access`,
+      `${apiHost}/api/v3/congregations/meeting/${congID}/visiting-speakers/pending-access`,
       {
         method: 'GET',
         credentials: 'include',
@@ -128,7 +128,7 @@ export const apiApproveRequestCongregationSpeakers = async (
   } = await apiDefault();
 
   const res = await fetch(
-    `${apiHost}api/v3/congregations/meeting/${congID}/visiting-speakers/request/approve`,
+    `${apiHost}/api/v3/congregations/meeting/${congID}/visiting-speakers/request/approve`,
     {
       method: 'POST',
       credentials: 'include',
@@ -158,7 +158,7 @@ export const apiRejectRequestCongregationSpeakers = async (
   } = await apiDefault();
 
   const res = await fetch(
-    `${apiHost}api/v3/congregations/meeting/${congID}/visiting-speakers/request/reject`,
+    `${apiHost}/api/v3/congregations/meeting/${congID}/visiting-speakers/request/reject`,
     {
       method: 'POST',
       credentials: 'include',

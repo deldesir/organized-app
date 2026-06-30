@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import worker from '@services/worker/backupWorker';
 import { setCurrentProvider } from '@services/states/app';
+import { dbAppSettingsUpdateWithoutNotice } from '@services/dexie/settings';
 
 const useFirebaseAuth = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -43,6 +44,28 @@ const useFirebaseAuth = () => {
 
       if (res.ok) {
         const data = await res.json();
+        const us = data?.app_settings?.user_settings ?? {};
+        const cs = data?.app_settings?.cong_settings ?? {};
+
+        // Persist the congregation profile into the local DB before anything
+        // else. The startup state machine (useStartup) gates on the local
+        // cong_name and bounces back to the sign-in screen while it is empty;
+        // the VIP auto-login query that would otherwise populate it runs async
+        // and loses that race. Writing it here first makes post-login startup
+        // proceed (to encryption/access-code setup, then the app).
+        await dbAppSettingsUpdateWithoutNotice({
+          'user_settings.id': data.id,
+          'user_settings.account_type': 'vip',
+          // firstname/lastname are { value, updatedAt } objects in the schema
+          // (firstnameState reads `.value`); writing bare strings corrupts the
+          // shape so `.value` is undefined and fullnameState crashes the app.
+          'user_settings.firstname': { value: us.firstname ?? '', updatedAt: '' },
+          'user_settings.lastname': { value: us.lastname ?? '', updatedAt: '' },
+          'user_settings.cong_role': us.cong_role ?? [],
+          'cong_settings.cong_name': cs.cong_name ?? '',
+          'cong_settings.country_code': cs.country_code ?? '',
+        });
+
         setIsAuthenticated(true);
         setUser({
           uid: data.id,
@@ -50,6 +73,21 @@ const useFirebaseAuth = () => {
         });
         setCurrentProvider('local');
         worker.postMessage({ field: 'userID', value: data.id });
+
+        // Signing in implies consent (so the startup flow doesn't drop back to
+        // the terms gate), and flags startup to wait for the profile to hydrate
+        // from the local DB after reload instead of bouncing to sign-in.
+        try {
+          localStorage.setItem('userConsent', 'accept');
+          localStorage.setItem('justLoggedIn', '1');
+        } catch {
+          // ignore storage errors
+        }
+
+        // Re-run every auth-gated hook (startup, auto-login) now that the
+        // session cookie is set and the profile is in the local DB. A full
+        // reload is the reliable way — auth state here is per-hook local state.
+        window.location.reload();
         return true;
       }
     } catch (e) {
@@ -66,6 +104,11 @@ const useFirebaseAuth = () => {
       });
     } catch {
       // Ignore errors on logout
+    }
+    try {
+      localStorage.removeItem('justLoggedIn');
+    } catch {
+      // ignore storage errors
     }
     setIsAuthenticated(false);
     setUser(null);
