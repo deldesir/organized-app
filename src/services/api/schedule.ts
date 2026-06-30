@@ -22,7 +22,7 @@ export const apiFetchSchedule = async () => {
     let res;
 
     if (accountType === 'pocket') {
-      res = await fetch(`${apiHost}api/v3/sws-pocket/meeting-schedule`, {
+      res = await fetch(`${apiHost}/api/v3/sws-pocket/meeting-schedule`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -34,7 +34,7 @@ export const apiFetchSchedule = async () => {
 
     if (accountType === 'vip') {
       res = await fetch(
-        `${apiHost}api/v3/congregations/${congID}/meeting-schedule`,
+        `${apiHost}/api/v3/congregations/${congID}/meeting-schedule`,
         {
           method: 'GET',
           headers: {
@@ -62,7 +62,7 @@ export const apiPublicScheduleGet = async () => {
   } = await apiDefault();
 
   const res = await fetch(
-    `${apiHost}api/v3/congregations/meeting/${congID}/schedules`,
+    `${apiHost}/api/v3/congregations/meeting/${congID}/schedules`,
     {
       method: 'GET',
       credentials: 'include',
@@ -99,7 +99,7 @@ export const apiPublishSchedule = async (
   } = await apiDefault();
 
   const res = await fetch(
-    `${apiHost}api/v3/congregations/meeting/${congID}/schedules`,
+    `${apiHost}/api/v3/congregations/meeting/${congID}/schedules`,
     {
       method: 'POST',
       credentials: 'include',
