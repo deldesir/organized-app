@@ -7,7 +7,7 @@
  */
 
 export const userSignOut = async () => {
-  const apiHost = import.meta.env.VITE_API_HOST || '/organized';
+  const apiHost = import.meta.env.VITE_API_HOST || '/oa';
   try {
     await fetch(`${apiHost}/api/v3/users/logout`, {
       credentials: 'include',

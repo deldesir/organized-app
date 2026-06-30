@@ -53,7 +53,7 @@ const useFeatureFlags = () => {
         tmpHost = import.meta.env.VITE_API_HOST;
       } else {
         // Default: same-origin under /organized/ prefix
-        tmpHost = '/organized';
+        tmpHost = '/oa';
       }
 
       setApiHost(tmpHost);

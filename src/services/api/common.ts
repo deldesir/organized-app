@@ -8,7 +8,7 @@ import {
 import { congIDState, congRoleState, JWLangState } from '@states/settings';
 
 export const apiDefault = async () => {
-  const apiHost = store.get(apiHostState) || import.meta.env.VITE_API_HOST || '/organized';
+  const apiHost = store.get(apiHostState) || import.meta.env.VITE_API_HOST || '/oa';
   const appVersion = import.meta.env.PACKAGE_VERSION;
   const appLang = store.get(appLangState);
   const congID = store.get(congIDState);

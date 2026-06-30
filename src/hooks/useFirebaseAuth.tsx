@@ -8,7 +8,7 @@ const useFirebaseAuth = () => {
 
   useEffect(() => {
     // Check for existing session by calling validate-me
-    const apiHost = import.meta.env.VITE_API_HOST || '/organized';
+    const apiHost = import.meta.env.VITE_API_HOST || '/oa';
     fetch(`${apiHost}/api/v3/users/validate-me`, {
       credentials: 'include',
     })
@@ -33,7 +33,7 @@ const useFirebaseAuth = () => {
 
   const login = async (username: string, password: string) => {
     try {
-      const apiHost = import.meta.env.VITE_API_HOST || '/organized';
+      const apiHost = import.meta.env.VITE_API_HOST || '/oa';
       const credentials = btoa(`${username}:${password}`);
 
       const res = await fetch(`${apiHost}/api/v3/user-login`, {
@@ -60,7 +60,7 @@ const useFirebaseAuth = () => {
 
   const logout = async () => {
     try {
-      const apiHost = import.meta.env.VITE_API_HOST || '/organized';
+      const apiHost = import.meta.env.VITE_API_HOST || '/oa';
       await fetch(`${apiHost}/api/v3/users/logout`, {
         credentials: 'include',
       });

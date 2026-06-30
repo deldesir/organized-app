@@ -7,9 +7,9 @@ import { resolve } from 'path';
 import svgx from '@svgx/vite-plugin-react';
 
 export default defineConfig({
-  // Served under the /organized/ subpath by IIAB nginx, so assets + router
+  // Served under the /oa/ subpath by IIAB nginx, so assets + router
   // basename must be prefixed accordingly (import.meta.env.BASE_URL).
-  base: '/organized/',
+  base: '/oa/',
   // eslint runs as a build plugin but must not fail the production build:
   // the self-hosted layer carries intentional stubs (unused params, loose
   // types) that are lint warnings, not bugs. Lint still reports them.

@@ -75,7 +75,7 @@ const PublicLinksSection = () => {
   const { t } = useAppTranslation();
 
   // Base-aware public links: the app is served under import.meta.env.BASE_URL
-  // (e.g. '/organized/'), so build shareable links inside that base instead of
+  // (e.g. '/oa/'), so build shareable links inside that base instead of
   // the server root — otherwise recipients land on whatever app owns '/'.
   const base = window.location.origin + import.meta.env.BASE_URL;
 
