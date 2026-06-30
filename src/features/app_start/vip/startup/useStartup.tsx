@@ -80,11 +80,27 @@ const useStartup = () => {
       }
 
       if (congName.length === 0) {
+        // Right after a local sign-in, the profile is written to the local DB
+        // and the page reloads. The settings live-query hydrates congName a
+        // moment after this check first runs (cookiesConsent initializes
+        // synchronously from localStorage, so this effect fires before the DB
+        // resolves). Without this guard we'd bounce straight back to sign-in
+        // and never recover, because this check is one-shot via isStart. While
+        // the just-signed-in flag is set, stay in the loading state and let the
+        // effect re-run when congName populates (congName is a dep of
+        // runStartupCheck), instead of bouncing.
+        if (localStorage.getItem('justLoggedIn') === '1') {
+          setIsLoading(true);
+          return;
+        }
         setIsLoading(false);
         setIsStart(false);
         showSignin();
         return;
       }
+
+      // congName is hydrated — the post-sign-in wait (if any) is over.
+      localStorage.removeItem('justLoggedIn');
 
       const approvedRole = congRole.some((role) => APP_ROLES.includes(role));
       const masterKeyNeeded = congRole.some((role) => VIP_ROLES.includes(role));

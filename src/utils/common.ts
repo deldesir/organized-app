@@ -55,19 +55,25 @@ export const buildPersonFullname = (
 ) => {
   const buildOption = option || FullnameOption.FIRST_BEFORE_LAST;
 
-  if (lastname.length === 0) {
-    return firstname;
+  // Defensive: tolerate undefined/missing name parts so a malformed settings
+  // record can never crash the whole app (fullnameState is read at app root,
+  // above the router error boundary — a throw here unmounts everything).
+  const lastnameSafe = lastname ?? '';
+  const firstnameSafe = firstname ?? '';
+
+  if (lastnameSafe.length === 0) {
+    return firstnameSafe;
   }
 
-  if (firstname.length === 0) {
-    return lastname;
+  if (firstnameSafe.length === 0) {
+    return lastnameSafe;
   }
 
   if (buildOption === FullnameOption.FIRST_BEFORE_LAST) {
-    return `${firstname} ${lastname}`;
+    return `${firstnameSafe} ${lastnameSafe}`;
   }
 
-  return `${lastname} ${firstname}`;
+  return `${lastnameSafe} ${firstnameSafe}`;
 };
 
 export const generateDisplayName = (lastname: string, firstname: string) => {
