@@ -16,8 +16,11 @@ declare const self: MyWorkerGlobalScope;
 
 self.setting = {
   apiHost: undefined,
-  userID: undefined,
-  idToken: undefined,
+  // Initialise the string fields empty (not undefined) so the `.length` guards
+  // in runBackup are always safe, even before the main thread posts them. Local
+  // cookie auth never sends an idToken, so it legitimately stays empty.
+  userID: '',
+  idToken: '',
   FEATURE_FLAGS: {},
 };
 
@@ -42,7 +45,10 @@ const runBackup = async () => {
     const settings = await dbGetSettings();
     const accountType = settings.user_settings.account_type;
 
-    if (accountType === 'vip' && idToken.length > 0 && userID.length > 0) {
+    // Self-hosted local auth has no Firebase idToken — the backup endpoints
+    // authenticate via the session cookie (credentials: 'include'), so gate on
+    // userID, not idToken. Cloud builds still pass idToken through the headers.
+    if (accountType === 'vip' && userID.length > 0) {
       backup = 'started';
       self.postMessage('Syncing');
 
