@@ -74,35 +74,40 @@ const PageLinkItem = ({
 const PublicLinksSection = () => {
   const { t } = useAppTranslation();
 
+  // Base-aware public links: the app is served under import.meta.env.BASE_URL
+  // (e.g. '/organized/'), so build shareable links inside that base instead of
+  // the server root — otherwise recipients land on whatever app owns '/'.
+  const base = window.location.origin + import.meta.env.BASE_URL;
+
   const links = [
     {
       label: t('tr_meetingSchedules'),
-      link: window.location.origin + '/#/weekly-schedules',
+      link: base + '#/weekly-schedules',
       isPublic: true,
     },
     {
       label: t('tr_informationBoard'),
-      link: window.location.origin + '/#/',
+      link: base + '#/',
       isPublic: true,
     },
     {
       label: t('tr_cleaningSchedules'),
-      link: window.location.origin + '/#/',
+      link: base + '#/',
       isPublic: true,
     },
     {
       label: t('tr_coVisitSchedules'),
-      link: window.location.origin + '/#/',
+      link: base + '#/',
       isPublic: true,
     },
     {
       label: t('tr_serviceMeetingSchedules'),
-      link: window.location.origin + '/#/',
+      link: base + '#/',
       isPublic: false,
     },
     {
       label: t('tr_meetingDutiesSchedules'),
-      link: window.location.origin + '/#/',
+      link: base + '#/',
       isPublic: false,
     },
   ];

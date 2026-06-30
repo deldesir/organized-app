@@ -91,15 +91,23 @@ const useGlobal = () => {
 
   // PWA shortcut redirect: the app uses hash routing (createHashRouter),
   // but manifest shortcut URLs use clean paths for cross-platform compatibility.
-  // This script converts clean paths to their hash equivalents before React loads.
+  // This converts clean paths to their hash equivalents before React loads.
+  // Base-aware: the app is served under import.meta.env.BASE_URL (e.g. '/' or
+  // '/organized/'). The redirect must stay inside that base — using a hardcoded
+  // root ('/#...') would bounce a load of the base path itself to the server
+  // root and any other app mounted there, carrying the hash along.
   useEffect(() => {
+    const base = import.meta.env.BASE_URL;
     const p = location.pathname;
     const s = location.search;
 
-    if (p !== '/') {
-      location.replace('/#' + p + s);
+    // Clean-path portion beyond the app base, without a leading slash.
+    const rel = p.startsWith(base) ? p.slice(base.length) : p.replace(/^\//, '');
+
+    if (rel) {
+      location.replace(base + '#/' + rel + s);
     } else if (s && !location.hash) {
-      location.replace('/#/' + s);
+      location.replace(base + '#/' + s);
     }
   }, []);
 
