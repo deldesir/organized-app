@@ -29,6 +29,7 @@ import {
 } from '@states/settings';
 import { APP_ROLES, VIP_ROLES } from '@constants/index';
 import { handleDeleteDatabase, loadApp, runUpdater } from '@services/app';
+import { dbAppSettingsUpdateWithoutNotice } from '@services/dexie/settings';
 import { apiValidateMe } from '@services/api/user';
 import { userSignOut } from '@services/firebase/auth';
 import useFirebaseAuth from '@hooks/useFirebaseAuth';
@@ -131,6 +132,15 @@ const useStartup = () => {
       }
 
       const { status, result } = await apiValidateMe();
+
+      // Backfill the local congregation id if it's missing (e.g. signed in
+      // before login() persisted it). The admin onboarding endpoints build
+      // congregations/admin/<cong_id>/... — an empty id 404s as admin//... .
+      if (status === 200 && result?.cong_id && congID.length === 0) {
+        await dbAppSettingsUpdateWithoutNotice({
+          'cong_settings.cong_id': result.cong_id,
+        });
+      }
 
       if (isUserAccountCreated) {
         setIsLoading(false);

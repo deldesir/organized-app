@@ -64,6 +64,10 @@ const useFirebaseAuth = () => {
           'user_settings.cong_role': us.cong_role ?? [],
           'cong_settings.cong_name': cs.cong_name ?? '',
           'cong_settings.country_code': cs.country_code ?? '',
+          // cong_id is needed so the admin onboarding endpoints
+          // (congregations/admin/<id>/master-key, /access-code) build a valid
+          // URL — without it the path becomes admin//master-key and 404s.
+          'cong_settings.cong_id': cs.id ?? '',
         });
 
         setIsAuthenticated(true);
