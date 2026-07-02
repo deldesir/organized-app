@@ -2,6 +2,7 @@ import { Box, Stack, TextField, Button } from '@mui/material';
 import { useState } from 'react';
 import { IconError } from '@icons/index';
 import { useAppTranslation, useFirebaseAuth } from '@hooks/index';
+import { displayOnboardingFeedback } from '@services/states/app';
 import useSignin from './useSignin';
 import InfoMessage from '@components/info-message';
 import PageHeader from '@features/app_start/shared/page_header';
@@ -9,12 +10,31 @@ import PageHeader from '@features/app_start/shared/page_header';
 const Signin = () => {
   const { t } = useAppTranslation();
   const { login } = useFirebaseAuth();
-  const { handleReturnChooser, hideMessage, message, title, variant } = useSignin();
+  const {
+    handleReturnChooser,
+    hideMessage,
+    showMessage,
+    message,
+    title,
+    variant,
+  } = useSignin();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const handleLogin = async () => {
-    await login(username, password);
+    setIsProcessing(true);
+    // login() reloads the page on success; a false return means it failed —
+    // surface it (a silent failure reads as a frozen app).
+    const ok = await login(username, password);
+    setIsProcessing(false);
+    if (!ok) {
+      displayOnboardingFeedback({
+        title: t('tr_loginFailed'),
+        message: t('tr_loginFailedDesc'),
+      });
+      showMessage();
+    }
   };
 
   return (
@@ -48,7 +68,12 @@ const Signin = () => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
-          <Button variant="contained" size="large" onClick={handleLogin}>
+          <Button
+            variant="contained"
+            size="large"
+            onClick={handleLogin}
+            disabled={isProcessing}
+          >
             Sign In
           </Button>
         </Stack>

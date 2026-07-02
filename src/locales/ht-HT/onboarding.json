@@ -130,5 +130,7 @@
   "tr_loginWithEmailDesc": "Sèvi ak Google, Yahoo, oswa yon lòt imel pou kreye epi sèvi ak kont ou nenpòt lè, sou nenpòt aparèy",
   "tr_loginWithCode": "Koneksyon ak kòd envitasyon",
   "tr_loginWithCodeDesc": "Aksè ak yon kòd yon sèl fwa sèlman nan navigatè sa a. Ou bezwen yon nouvo kòd chak fwa",
-  "tr_loginEmailCode": "Sinon, ou ka antre tou kòd sekirize nou te voye nan imel ou an."
+  "tr_loginEmailCode": "Sinon, ou ka antre tou kòd sekirize nou te voye nan imel ou an.",
+  "tr_loginFailed": "Nou pa t ka konekte w",
+  "tr_loginFailedDesc": "Non itilizatè a oswa modpas la pa kòrèk, oswa sèvè a pa reponn. Verifye yo epi eseye ankò."
 }

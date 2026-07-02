@@ -130,5 +130,7 @@
   "tr_loginWithEmailDesc": "Faaohipa ia Google, Yahoo, aore ra te tahi atu rata uira no te hamani e no te faaohipa i ta oe pute i te mau taime atoa, i nia i te mau matini atoa",
   "tr_loginWithCode": "Tomoraa na roto i te code titau-manihini-raa",
   "tr_loginWithCodeDesc": "Tomo na roto i te code no te taime hoê i nia noa i teie faanahoraa maimiraa. E titauhia te hoê code apî i te mau taime atoa",
-  "tr_loginEmailCode": "Aore ra, e nehenehe atoa oe e tuu i te code paruruhia ta matou i tono atu i ta oe rata uira."
+  "tr_loginEmailCode": "Aore ra, e nehenehe atoa oe e tuu i te code paruruhia ta matou i tono atu i ta oe rata uira.",
+  "tr_loginFailed": "Unable to sign in",
+  "tr_loginFailedDesc": "The username or password is incorrect, or the server could not be reached. Check them and try again."
 }

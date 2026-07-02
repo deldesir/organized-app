@@ -130,5 +130,7 @@
   "tr_loginWithEmailDesc": "Használd a Google, Yahoo vagy más e-mail szolgáltatást, hogy bármikor, bármilyen eszközön létrehozd és használhasd fiókodat",
   "tr_loginWithCode": "Bejelentkezés meghívó kóddal",
   "tr_loginWithCodeDesc": "Hozzáférés csak ebben a böngészőben, egyszeri kóddal. Minden alkalommal új kódra van szükség",
-  "tr_loginEmailCode": "Alternatívaként megadhatod a biztonsági kódot is, amit elküldtünk az e-mail címedre."
+  "tr_loginEmailCode": "Alternatívaként megadhatod a biztonsági kódot is, amit elküldtünk az e-mail címedre.",
+  "tr_loginFailed": "Unable to sign in",
+  "tr_loginFailedDesc": "The username or password is incorrect, or the server could not be reached. Check them and try again."
 }
