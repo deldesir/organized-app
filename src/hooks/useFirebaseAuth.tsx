@@ -59,8 +59,22 @@ const useFirebaseAuth = () => {
           // firstname/lastname are { value, updatedAt } objects in the schema
           // (firstnameState reads `.value`); writing bare strings corrupts the
           // shape so `.value` is undefined and fullnameState crashes the app.
-          'user_settings.firstname': { value: us.firstname ?? '', updatedAt: '' },
-          'user_settings.lastname': { value: us.lastname ?? '', updatedAt: '' },
+          // Accept both bare strings and already-wrapped {value} objects —
+          // wrapping an object again corrupts the schema (renders as a dict).
+          'user_settings.firstname': {
+            value:
+              typeof us.firstname === 'object' && us.firstname !== null
+                ? (us.firstname.value ?? '')
+                : (us.firstname ?? ''),
+            updatedAt: '',
+          },
+          'user_settings.lastname': {
+            value:
+              typeof us.lastname === 'object' && us.lastname !== null
+                ? (us.lastname.value ?? '')
+                : (us.lastname ?? ''),
+            updatedAt: '',
+          },
           'user_settings.cong_role': us.cong_role ?? [],
           'cong_settings.cong_name': cs.cong_name ?? '',
           'cong_settings.country_code': cs.country_code ?? '',
