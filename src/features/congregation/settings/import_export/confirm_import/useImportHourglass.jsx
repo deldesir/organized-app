@@ -1,4 +1,14 @@
 import { formatDate } from 'date-fns';
+import { useAtomValue } from 'jotai';
+import { congNameState } from '@states/settings';
+import { scheduleSchema, sourceSchema } from '@services/dexie/schema';
+
+const foldName = (value) =>
+  (value || '')
+    .normalize('NFD')
+    .replace(/\p{Diacritic}/gu, '')
+    .toLowerCase()
+    .trim();
 
 const generateDisplayName = (lastname, firstname) => {
   if (lastname.length === 0) {
@@ -18,6 +28,140 @@ const generateDisplayName = (lastname, firstname) => {
 };
 
 const useHourglassImport = () => {
+  const congName = useAtomValue(congNameState);
+
+  const buildPersonIndex = (HOURGLASS_DATA) => {
+    // fsr's unified program lists persons as "Firstname Lastname"; publishers
+    // carry first/last separately — index both orders, accent-insensitive.
+    const index = new Map();
+    const all = [
+      ...(HOURGLASS_DATA.publishers || []),
+      ...(HOURGLASS_DATA.notPublishers || []),
+    ];
+    for (const record of all) {
+      if (!record.uuid) continue;
+      index.set(foldName(`${record.firstname} ${record.lastname}`), record.uuid);
+      index.set(foldName(`${record.lastname}, ${record.firstname}`), record.uuid);
+    }
+    return index;
+  };
+
+  const migrateProgramSchedules = (HOURGLASS_DATA) => {
+    // The `program` key comes from fsr's unified export (`fsr export
+    // organized`): the meeting program parsed from the "Tout pwogram ansanm"
+    // docx, which the plain Hourglass JSON does not contain.
+    const program = HOURGLASS_DATA.program;
+    if (!program) return [];
+
+    const index = buildPersonIndex(HOURGLASS_DATA);
+    const now = new Date().toISOString();
+    const own = foldName(congName);
+
+    const slot = (person) => ({
+      type: 'main',
+      value: index.get(foldName(person)) || '',
+      name: person || '',
+      updatedAt: now,
+    });
+
+    const byWeek = new Map();
+    const entryFor = (weekOf) => {
+      if (!byWeek.has(weekOf)) {
+        const entry = structuredClone(scheduleSchema);
+        entry.weekOf = weekOf;
+        byWeek.set(weekOf, entry);
+      }
+      return byWeek.get(weekOf);
+    };
+
+    for (const talk of program.weekend || []) {
+      if (!talk.week_of) continue;
+      const wm = entryFor(talk.week_of).weekend_meeting;
+      wm.speaker.part_1[0] = slot(talk.speaker);
+      const local = !talk.speaker_cong || foldName(talk.speaker_cong) === own;
+      wm.public_talk_type[0] = {
+        type: 'main',
+        value: local ? 'localSpeaker' : 'visitingSpeaker',
+        updatedAt: now,
+      };
+      if (talk.chairman) wm.chairman[0] = slot(talk.chairman);
+      if (talk.wt_reader) wm.wt_study.reader[0] = slot(talk.wt_reader);
+    }
+
+    for (const meeting of program.midweek || []) {
+      if (!meeting.week_of) continue;
+      const mw = entryFor(meeting.week_of).midweek_meeting;
+
+      for (const part of meeting.parts || []) {
+        const { person, part_type: partType, school = 1 } = part;
+        if (!person) continue;
+
+        if (partType === 'Chairman') {
+          mw.chairman.main_hall[0] = slot(person);
+        } else if (partType === 'AuxiliaryClassroomCounselor') {
+          mw.chairman.aux_class_1 = slot(person);
+        } else if (partType === 'OpeningPrayer') {
+          mw.opening_prayer[0] = slot(person);
+        } else if (partType === 'ClosingPrayer') {
+          mw.closing_prayer[0] = slot(person);
+        } else if (partType === 'TreasuresTalk') {
+          mw.tgw_talk[0] = slot(person);
+        } else if (partType === 'SpiritualGems') {
+          mw.tgw_gems[0] = slot(person);
+        } else if (partType === 'BibleReading') {
+          if (school === 1) {
+            mw.tgw_bible_reading.main_hall[0] = slot(person);
+          } else {
+            mw.tgw_bible_reading.aux_class_1 = slot(person);
+          }
+        } else if (partType === 'CBS') {
+          mw.lc_cbs.conductor[0] = slot(person);
+        } else if (partType === 'CBSReader') {
+          mw.lc_cbs.reader[0] = slot(person);
+        } else {
+          const apply = partType.match(/^Apply(\d)(Assistant)?$/);
+          const living = partType.match(/^Living(\d)$/);
+
+          if (apply && +apply[1] >= 1 && +apply[1] <= 4) {
+            const target = mw[`ayf_part${apply[1]}`];
+            const role = apply[2] ? 'assistant' : 'student';
+            if (school === 1) {
+              target.main_hall[role][0] = slot(person);
+            } else {
+              target.aux_class_1[role] = slot(person);
+            }
+          } else if (living && +living[1] >= 1 && +living[1] <= 3 && school === 1) {
+            mw[`lc_part${living[1]}`][0] = slot(person);
+          }
+        }
+      }
+    }
+
+    return [...byWeek.values()].sort((a, b) =>
+      a.weekOf.localeCompare(b.weekOf)
+    );
+  };
+
+  const migrateProgramSources = (HOURGLASS_DATA) => {
+    const program = HOURGLASS_DATA.program;
+    if (!program) return [];
+
+    const now = new Date().toISOString();
+    const sources = [];
+    for (const talk of program.weekend || []) {
+      if (!talk.week_of) continue;
+      const entry = structuredClone(sourceSchema);
+      entry.weekOf = talk.week_of;
+      entry.weekend_meeting.public_talk[0] = {
+        type: 'main',
+        value: talk.outline_number || '',
+        updatedAt: now,
+      };
+      sources.push(entry);
+    }
+    return sources.sort((a, b) => a.weekOf.localeCompare(b.weekOf));
+  };
+
   const migrateHourglassPersons = (HOURGLASS_DATA) => {
     const ALL_PUBLISHERS = structuredClone(HOURGLASS_DATA.publishers);
 
@@ -598,6 +742,8 @@ const useHourglassImport = () => {
     migrateFieldServiceGroups,
     migrateBranchFieldServiceReports,
     migrateCongFieldServiceReports,
+    migrateProgramSchedules,
+    migrateProgramSources,
   };
 };
 
