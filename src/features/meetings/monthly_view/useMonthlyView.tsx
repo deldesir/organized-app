@@ -37,23 +37,43 @@ const useMonthlyView = () => {
   );
 
   const getWeeksByMonthAndYear = useCallback(
-    (year: number, month: number) => {
-      let weeks = [];
-      sourcesFormatted.forEach((srcYear) => {
-        if (srcYear.value == year) {
-          weeks = srcYear.months.find(
-            (formattedMonth) => formattedMonth.value == month
-          ).weeks;
-        }
-      });
-      return weeks;
+    (year: number, monthIndex: number) => {
+      const yearRecord = sourcesFormatted.find(
+        (srcYear) => srcYear.value == year
+      );
+      if (!yearRecord) return [];
+
+      // `monthIndex` is the position in the (newest-first) list of months
+      // that actually have source data — the same index the month <Select>
+      // and `selectedMonth` use. Months are stored with a "YYYY/MM" `value`,
+      // never a bare month number, so a null-safe lookup by position is what
+      // keeps this from throwing on a month with no imported materials.
+      const monthRecord = yearRecord.months.toReversed()[monthIndex];
+      return monthRecord ? monthRecord.weeks : [];
     },
     [sourcesFormatted]
   );
 
   const currentYear = new Date().getFullYear().toString();
 
-  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
+  // Months of the current year that have source data, newest first. Both the
+  // month <Select> and `selectedMonth` index into this list (not a calendar
+  // 0-11 month), so it must be derived the same way everywhere.
+  const currentYearMonths =
+    sourcesFormatted
+      .find((srcYear) => srcYear.value.toString() === currentYear)
+      ?.months.toReversed() ?? [];
+
+  const currentMonthKey = `${currentYear}/${String(
+    new Date().getMonth() + 1
+  ).padStart(2, '0')}`;
+
+  const [selectedMonth, setSelectedMonth] = useState(
+    Math.max(
+      0,
+      currentYearMonths.findIndex((month) => month.value === currentMonthKey)
+    )
+  );
   const [selectedWeeks, setSelectedWeeks] = useState(
     getWeeksByMonthAndYear(parseInt(currentYear), selectedMonth)
   );
@@ -118,10 +138,9 @@ const useMonthlyView = () => {
   const [addCustomModalWindowWeek, setAddCustomModalWindowWeek] =
     useState(null);
 
-  const thisYearMonths = sourcesFormatted
-    .find((year) => year.value.toString() === currentYear)
-    .months.toReversed()
-    .map((month) => monthNames[month.value]);
+  const thisYearMonths = currentYearMonths.map(
+    (month) => monthNames[parseInt(month.value.split('/')[1], 10) - 1]
+  );
 
   const monthName = thisYearMonths[selectedMonth];
 

@@ -54,7 +54,15 @@ const Signin = () => {
           gap: '24px',
         }}
       >
-        <Stack spacing="24px" sx={{ mt: 4 }}>
+        <Stack
+          component="form"
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleLogin();
+          }}
+          spacing="24px"
+          sx={{ mt: 4 }}
+        >
           <TextField
             label="Username"
             variant="outlined"
@@ -71,7 +79,7 @@ const Signin = () => {
           <Button
             variant="contained"
             size="large"
-            onClick={handleLogin}
+            type="submit"
             disabled={isProcessing}
           >
             Sign In
