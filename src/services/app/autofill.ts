@@ -1123,7 +1123,11 @@ export const schedulesStartAutofill = async (
 
       if (!isValid) return false;
 
-      const source = sources.find((src) => src.weekOf === schedule.weekOf)!;
+      const source = sources.find((src) => src.weekOf === schedule.weekOf);
+
+      // A scheduled week can lack imported source materials; the non-null
+      // assertion here used to throw and abort the whole autofill run.
+      if (!source) return false;
 
       if (meeting === 'midweek') {
         if (!source.midweek_meeting.week_date_locale[lang]) return false;
