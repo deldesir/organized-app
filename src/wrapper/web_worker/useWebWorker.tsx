@@ -106,7 +106,10 @@ const useWebWorker = () => {
       }
 
       if (backupEnabled) {
-        if (user) {
+        // Cookie-auth (self-hosted) users are a plain stub without a Firebase
+        // getIdToken(); calling it threw on every backup tick and spammed the
+        // console. Backups authenticate by cookie, so the idToken is optional.
+        if (user && typeof user.getIdToken === 'function') {
           const idToken = await user.getIdToken(true);
 
           if (idToken?.length > 0) {

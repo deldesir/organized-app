@@ -62,7 +62,7 @@ const useCongregation = () => {
   const handleManualSync = async () => {
     await dbMetadataReset();
 
-    if (accountType === 'vip') {
+    if (accountType === 'vip' && typeof user?.getIdToken === 'function') {
       worker.postMessage({
         field: 'idToken',
         value: await user.getIdToken(true),
