@@ -125,7 +125,7 @@
   "tr_requestAccessSentDesc": "Demann aksè voye! Administratè kongregasyon w lan ap egzamine l. Si w pa jwenn repons apre kèk jou, ou lib pou kontakte l pèsonèlman.",
   "tr_accountCreatedJoin": "Kont ou kreye! Si kongregasyon w lan deja ap sèvi ak Organized, antre detay ou yo epi chwazi kongregasyon w lan pou enfòme administratè a. Apre l fin ba ou pèmisyon, rafrechi paj la pou w konekte.",
   "tr_loginOAuthHint": "Konekte pi vit ak {{ oauth }} lè w sèvi ak bouton anba a",
-  "tr_disconnectAccount": "Dekonekte kont mwen an",
+  "tr_disconnectAccount": "Dekonekte kont lan (kite done yo sou aparèy la)",
   "tr_loginWithEmail": "Koneksyon ak imel",
   "tr_loginWithEmailDesc": "Sèvi ak Google, Yahoo, oswa yon lòt imel pou kreye epi sèvi ak kont ou nenpòt lè, sou nenpòt aparèy",
   "tr_loginWithCode": "Koneksyon ak kòd envitasyon",
