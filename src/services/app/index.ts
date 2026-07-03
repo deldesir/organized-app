@@ -132,15 +132,20 @@ export const handleDeleteDatabase = async () => {
 };
 
 export const checkPwaUpdate = () => {
-  if ('serviceWorker' in navigator) {
-    const swUrl = `${import.meta.env.BASE_URL}service-worker.js`;
-    navigator.serviceWorker
-      .register(swUrl, { updateViaCache: 'none' })
-      .then((reg) => {
-        reg.update().catch(() => {});
-      })
-      .catch(() => {});
-  }
+  if (!('serviceWorker' in navigator)) return;
+
+  // Poll the EXISTING registration (owned by ServiceWorkerWrapper in
+  // RootWrap) for a newer service worker. A fresh register() here would
+  // create a second, competing registration with different options and only
+  // churn the SW; instead we ask the browser to re-check. When a new worker
+  // is found, the wrapper's `updatefound`/`onWaiting` handlers fire and the
+  // AppUpdater snackbar ("Update available") is shown to the user. This runs
+  // on every route change and on tab focus, so a deploy is picked up quickly
+  // without an abrupt reload.
+  navigator.serviceWorker
+    .getRegistration()
+    .then((reg) => reg?.update())
+    .catch(() => {});
 };
 
 export const getUserDataView = <T extends { type: string }>(
