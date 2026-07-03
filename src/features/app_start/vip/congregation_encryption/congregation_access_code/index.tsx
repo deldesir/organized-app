@@ -77,6 +77,11 @@ const CongregationAccessCode = () => {
                   autoComplete="off"
                   value={tmpAccessCode}
                   onChange={(e) => setTmpAccessCode(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !btnActionDisabled) {
+                      handleValidateAccessCode();
+                    }
+                  }}
                   startIcon={<IconCongregationAccess />}
                   resetHelperPadding={true}
                 />
