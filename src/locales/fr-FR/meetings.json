@@ -3,7 +3,7 @@
   "tr_hall": "Salle",
   "tr_hallWithName": "Salle {{ name }}",
   "tr_export": "Exporter",
-  "tr_exportSelectRangeAndForm": "Sélectionnez une plage de semaines et au moins un formulaire (S-140 ou S-89) à exporter.",
+  "tr_exportSelectRangeAndForm": "Sélectionnez une plage de semaines et au moins un formulaire à exporter.",
   "tr_autofill": "Remplissage automatique",
   "tr_infoPlanMidweekMeeting": "Sélectionnez une semaine pour commencer à ajouter des attributions et modifier le programme si nécessaire. Vous pouvez également utiliser la fonctionnalité de remplissage automatique et Organized assignera les attributions en fonction des qualifications de l'utilisateur.",
   "tr_infoSecondPlanMidweekMeeting": "Sélectionnez une semaine pour effectuer une planification manuelle, ou laissez Organized générer automatiquement des attributions grâce à la fonctionnalité de remplissage automatique, prenant en compte les qualifications de la personne et ses précédentes attributions. Il sera possible de les modifier au besoin.",
