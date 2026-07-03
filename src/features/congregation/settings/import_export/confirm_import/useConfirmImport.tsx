@@ -76,6 +76,8 @@ const useConfirmImport = ({ onClose }: ConfirmImportProps) => {
     migrateCongFieldServiceReports,
     migrateHourglassAttendance,
     migrateBranchFieldServiceReports,
+    migrateProgramSchedules,
+    migrateProgramSources,
   } = useImportHourglass();
 
   const filename = useAtomValue(backupFileNameState);
@@ -272,6 +274,13 @@ const useConfirmImport = ({ onClose }: ConfirmImportProps) => {
         return backupData;
       }
 
+      if (backupFileType === 'Hourglass') {
+        // fsr's unified export embeds the meeting program (parsed from the
+        // "Tout pwogram ansanm" docx) under a `program` key — the plain
+        // Hourglass JSON has no program, so this stays [] for it.
+        return migrateProgramSchedules(backupContents) as SchedWeekType[];
+      }
+
       return [];
     } catch (error) {
       console.error(error);
@@ -284,7 +293,7 @@ const useConfirmImport = ({ onClose }: ConfirmImportProps) => {
 
       return [];
     }
-  }, [backupFileType, backupContents, t]);
+  }, [backupFileType, backupContents, migrateProgramSchedules, t]);
 
   const cong_settings = useMemo(() => {
     try {
@@ -631,6 +640,15 @@ const useConfirmImport = ({ onClose }: ConfirmImportProps) => {
 
         if (backupFileType === 'Organized') {
           const sources = backup.data['sources'] as SourceWeekType[];
+          data.sources = getSources(sources);
+        }
+
+        if (backupFileType === 'Hourglass' && isWeekend) {
+          // Weekend talk numbers ride in sources; the unified export
+          // resolves them from the S-34 corpus (0 when unresolved).
+          const sources = migrateProgramSources(
+            backupContents
+          ) as SourceWeekType[];
           data.sources = getSources(sources);
         }
       }
