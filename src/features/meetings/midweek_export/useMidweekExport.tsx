@@ -39,6 +39,7 @@ import {
   TemplateS89Doc4in1,
 } from '@views/index';
 import { cookiesConsentState } from '@states/app';
+import { useAppTranslation } from '@hooks/index';
 import { addDays } from '@utils/date';
 import { headerForScheduleState } from '@states/field_service_groups';
 import { WEEK_TYPE_NO_MEETING } from '@constants/index';
@@ -46,6 +47,7 @@ import { formatDate } from 'date-fns';
 import { sourcesState } from '@states/sources';
 
 const useMidweekExport = (onClose: MidweekExportType['onClose']) => {
+  const { t } = useAppTranslation();
   const [S89Template, setS89Template] = useAtom(S89TemplateState);
   const [S140Template, setS140Template] = useAtom(S140TemplateState);
 
@@ -193,8 +195,20 @@ const useMidweekExport = (onClose: MidweekExportType['onClose']) => {
 
   const handleExportSchedule = async () => {
     if (isProcessing) return;
-    if (startWeek.length === 0 || endWeek.length === 0) return;
-    if (!exportS140 && !exportS89) return;
+
+    // Silent early returns read as a dead button. Tell the user what's missing.
+    if (
+      startWeek.length === 0 ||
+      endWeek.length === 0 ||
+      (!exportS140 && !exportS89)
+    ) {
+      displaySnackNotification({
+        header: getMessageByCode('error_app_generic-title'),
+        message: t('tr_exportSelectRangeAndForm'),
+        severity: 'warning',
+      });
+      return;
+    }
 
     try {
       setIsProcessing(true);
@@ -206,9 +220,16 @@ const useMidweekExport = (onClose: MidweekExportType['onClose']) => {
 
         if (!isValid) return false;
 
-        const source = sources.find((src) => src.weekOf === schedule.weekOf)!;
+        // A scheduled week can exist without imported source materials (e.g.
+        // Hourglass assignments outside the loaded range). Guard the lookup —
+        // the old non-null assertion threw and the catch silently closed the
+        // dialog, exporting nothing with no explanation. Also skip weeks whose
+        // materials are in a different language than the current source lang.
+        const source = sources.find((src) => src.weekOf === schedule.weekOf);
 
-        if (!source.midweek_meeting.week_date_locale[lang]) return false;
+        if (!source || !source.midweek_meeting.week_date_locale[lang]) {
+          return false;
+        }
 
         if (dataView !== 'main') {
           const weekType =
@@ -223,6 +244,16 @@ const useMidweekExport = (onClose: MidweekExportType['onClose']) => {
 
         return isValid;
       });
+
+      if (weeksList.length === 0) {
+        setIsProcessing(false);
+        displaySnackNotification({
+          header: getMessageByCode('error_app_generic-title'),
+          message: t('tr_noMeetingWeek'),
+          severity: 'warning',
+        });
+        return;
+      }
 
       if (exportS89) {
         await handleExportS89(weeksList);
