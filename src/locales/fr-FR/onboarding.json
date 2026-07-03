@@ -125,7 +125,7 @@
   "tr_requestAccessSentDesc": "Demande d'accès envoyée ! L’administrateur de votre congrégation l’examinera. Si vous n'avez pas de réponse après quelques jours, n'hésitez pas à le contacter personnellement.",
   "tr_accountCreatedJoin": "Votre compte a été créé ! Si votre congrégation utilise déjà Organized, saisissez vos coordonnées et sélectionnez votre congrégation pour en informer l'administrateur. Après qu'il vous ait accordé les autorisations, actualisez la page pour vous connecter.",
   "tr_loginOAuthHint": "Connectez-vous rapidement avec {{ oauth }} en utilisant le bouton ci-dessous",
-  "tr_disconnectAccount": "Déconnecter le compte (garder les données sur l'appareil)",
+  "tr_disconnectAccount": "Se déconnecter",
   "tr_loginWithEmail": "Se connecter avec une adresse mail",
   "tr_loginWithEmailDesc": "Utilisez Google, Yahoo ou un autre e-mail pour créer et utiliser votre compte à tout moment, sur n'importe quel appareil",
   "tr_loginWithCode": "Connexion avec un code d'invitation",
