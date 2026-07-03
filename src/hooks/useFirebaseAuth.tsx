@@ -3,9 +3,17 @@ import worker from '@services/worker/backupWorker';
 import { setCurrentProvider } from '@services/states/app';
 import { dbAppSettingsUpdateWithoutNotice } from '@services/dexie/settings';
 
+// Minimal shape of the local (cookie-auth) user. `getIdToken` is optional and
+// absent in self-hosted mode — call sites guard on it before use.
+type LocalUser = {
+  uid: string;
+  providerData: { providerId: string }[];
+  getIdToken?: (forceRefresh?: boolean) => Promise<string>;
+};
+
 const useFirebaseAuth = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<LocalUser | null>(null);
 
   useEffect(() => {
     // Check for existing session by calling validate-me

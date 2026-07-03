@@ -62,6 +62,16 @@ export default [
       'react/jsx-uses-react': 'error',
       'react/jsx-uses-vars': 'error',
       'import/no-cycle': ['error', { maxDepth: 9999 }],
+      // Allow intentionally-unused params/vars prefixed with `_` (used by the
+      // self-hosted stubs that keep a signature but ignore some arguments).
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        {
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+          caughtErrorsIgnorePattern: '^_',
+        },
+      ],
     },
   },
 ];
