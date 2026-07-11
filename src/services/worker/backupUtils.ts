@@ -1594,20 +1594,37 @@ export const dbExportDataBackup = async (backupData: BackupDataType) => {
     const cong_master_key =
       await oldData.settings.cong_settings.cong_master_key;
 
-    const accessCode = decryptData(
-      backupData.app_settings.cong_settings['cong_access_code'],
-      cong_access_code,
-      'access_code'
-    );
+    // The server stores the gates encrypted-with-themselves; decrypting with
+    // the local code both verifies it and yields the plaintext. A failure
+    // here normally means "wrong local code" — but on this self-hosted
+    // deployment it can also mean the server still holds a legacy PLAINTEXT
+    // value (uploaded before the backup path encrypted gates). Treat that as
+    // "server value stale": trust the local code and let this sync re-upload
+    // the properly encrypted form. Without the fallback the throw kills every
+    // sync cycle permanently (observed live 2026-07-11).
+    let accessCode: string;
+    try {
+      accessCode = decryptData(
+        backupData.app_settings.cong_settings['cong_access_code'],
+        cong_access_code,
+        'access_code'
+      );
+    } catch {
+      accessCode = cong_access_code;
+    }
 
     let masterKey: string;
 
     if (backupData.app_settings.cong_settings['cong_master_key']) {
-      masterKey = decryptData(
-        backupData.app_settings.cong_settings['cong_master_key'],
-        cong_master_key,
-        'master_key'
-      );
+      try {
+        masterKey = decryptData(
+          backupData.app_settings.cong_settings['cong_master_key'],
+          cong_master_key,
+          'master_key'
+        );
+      } catch {
+        masterKey = cong_master_key;
+      }
     }
 
     await dbRestoreFromBackup(backupData, accessCode, masterKey);
@@ -1699,6 +1716,23 @@ export const dbExportDataBackup = async (backupData: BackupDataType) => {
             masterKey,
             accessCode,
           });
+
+          // encryptObject is pass-through on this deployment, so the gates
+          // would round-trip as PLAINTEXT — which the decrypt-verify above
+          // (and the new-device gate screens) cannot handle. Store them
+          // encrypted-with-themselves, the shape everything expects.
+          if (localSettings.cong_settings.cong_access_code) {
+            localSettings.cong_settings.cong_access_code = encryptData(
+              cong_access_code,
+              cong_access_code
+            );
+          }
+          if (localSettings.cong_settings.cong_master_key) {
+            localSettings.cong_settings.cong_master_key = encryptData(
+              cong_master_key,
+              cong_master_key
+            );
+          }
 
           if (metadata.metadata.user_settings.send_local) {
             obj.app_settings.user_settings = localSettings.user_settings;
