@@ -987,7 +987,12 @@ export const schedulesGetHistoryDetails = ({
     const { src, desc } = sourcesLCGet(lcPart, dataView, lang);
     const time = sourcesPartTiming(source, type, dataView, lang);
 
-    history.assignment.src = `${src} ${getTranslation({ key: 'tr_partDuration', params: { time } })}`;
+    // Week content may not be imported yet (assignments sync separately
+    // from source materials) — never render "undefined ( min.)".
+    const partSrc = src || getTranslation({ key: 'tr_lcPart' });
+    history.assignment.src = time
+      ? `${partSrc} ${getTranslation({ key: 'tr_partDuration', params: { time } })}`
+      : partSrc;
     history.assignment.desc = desc;
   }
 
@@ -1001,7 +1006,10 @@ export const schedulesGetHistoryDetails = ({
 
     const time = sourcesPartTiming(source, 'lc_part3', dataView, lang);
 
-    history.assignment.src = `${src} ${getTranslation({ key: 'tr_partDuration', params: { time } })}`;
+    const partSrc = src || getTranslation({ key: 'tr_lcPart' });
+    history.assignment.src = time
+      ? `${partSrc} ${getTranslation({ key: 'tr_partDuration', params: { time } })}`
+      : partSrc;
     history.assignment.desc = desc;
   }
 
