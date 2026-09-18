@@ -16,8 +16,16 @@ import {
   userDataViewState,
 } from '@states/settings';
 import { sourcesFormattedState, sourcesState } from '@states/sources';
-import { SetStateAction, useCallback, useEffect, useState } from 'react';
+import {
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import { useAtomValue } from 'jotai';
+
+const DEFAULT_AYF_COUNT = 3;
 
 const useMonthlyView = () => {
   const { t } = useAppTranslation();
@@ -36,50 +44,59 @@ const useMonthlyView = () => {
     midweekMeetingClosingPrayerLinkedState
   );
 
-  const getWeeksByMonthAndYear = useCallback(
-    (year: number, monthIndex: number) => {
-      const yearRecord = sourcesFormatted.find(
-        (srcYear) => srcYear.value == year
-      );
-      if (!yearRecord) return [];
+  // the material files a month under a `YYYY/MM` key, so that key is what the
+  // list, the selection and the lookup all speak
+  const getWeeksByMonth = useCallback(
+    (month: string) => {
+      for (const year of sourcesFormatted) {
+        const found = year.months.find((record) => record.value === month);
 
-      // `monthIndex` is the position in the (newest-first) list of months
-      // that actually have source data — the same index the month <Select>
-      // and `selectedMonth` use. Months are stored with a "YYYY/MM" `value`,
-      // never a bare month number, so a null-safe lookup by position is what
-      // keeps this from throwing on a month with no imported materials.
-      const monthRecord = yearRecord.months.toReversed()[monthIndex];
-      return monthRecord ? monthRecord.weeks : [];
+        if (found) return found.weeks;
+      }
+
+      // a month without material simply has no weeks to show
+      return [];
     },
     [sourcesFormatted]
   );
 
   const currentYear = new Date().getFullYear().toString();
 
-  // Months of the current year that have source data, newest first. Both the
-  // month <Select> and `selectedMonth` index into this list (not a calendar
-  // 0-11 month), so it must be derived the same way everywhere.
-  const currentYearMonths =
-    sourcesFormatted
-      .find((srcYear) => srcYear.value.toString() === currentYear)
-      ?.months.toReversed() ?? [];
+  // the months of this year that have material, newest first already
+  const thisYearMonths = useMemo(() => {
+    const year = sourcesFormatted.find(
+      (record) => record.value.toString() === currentYear
+    );
 
-  const currentMonthKey = `${currentYear}/${String(
-    new Date().getMonth() + 1
-  ).padStart(2, '0')}`;
+    return (year?.months ?? []).map((month) => ({
+      value: month.value,
+      label: monthNames[Number(month.value.split('/')[1]) - 1],
+    }));
+  }, [sourcesFormatted, currentYear, monthNames]);
 
-  const [selectedMonth, setSelectedMonth] = useState(
-    Math.max(
-      0,
-      currentYearMonths.findIndex((month) => month.value === currentMonthKey)
-    )
+  // a congregation whose material stops short of today opens on its newest
+  const preferredMonth = useCallback((months: typeof thisYearMonths) => {
+    const today = new Date();
+
+    const thisMonth = `${today.getFullYear()}/${String(
+      today.getMonth() + 1
+    ).padStart(2, '0')}`;
+
+    const hasThisMonth = months.some((month) => month.value === thisMonth);
+
+    return hasThisMonth ? thisMonth : (months[0]?.value ?? '');
+  }, []);
+
+  const [selectedMonth, setSelectedMonth] = useState(() =>
+    preferredMonth(thisYearMonths)
   );
-  const [selectedWeeks, setSelectedWeeks] = useState(
-    getWeeksByMonthAndYear(parseInt(currentYear), selectedMonth)
+
+  const [selectedWeeks, setSelectedWeeks] = useState(() =>
+    getWeeksByMonth(selectedMonth)
   );
 
   const [weeksTypes, setWeeksTypes] = useState(
-    Array(selectedWeeks.length).fill(Week.NORMAL)
+    Array(selectedWeeks.length).fill({ value: Week.NORMAL })
   );
   const [ayfCount, setAyfCount] = useState(Array(selectedWeeks.length).fill(1));
   const [ayfParts1, setAyfParts1] = useState<AssignmentCode[]>(
@@ -138,11 +155,8 @@ const useMonthlyView = () => {
   const [addCustomModalWindowWeek, setAddCustomModalWindowWeek] =
     useState(null);
 
-  const thisYearMonths = currentYearMonths.map(
-    (month) => monthNames[parseInt(month.value.split('/')[1], 10) - 1]
-  );
-
-  const monthName = thisYearMonths[selectedMonth];
+  const monthName =
+    thisYearMonths.find((month) => month.value === selectedMonth)?.label ?? '';
 
   const getWeekLocale = (date, monthName) => {
     return t('tr_longDateNoYearLocale', {
@@ -215,19 +229,36 @@ const useMonthlyView = () => {
     });
   };
 
+  // the material arrives from the database after this view is mounted, and a
+  // month can equally disappear from it, so the choice is kept answerable
   useEffect(() => {
-    setSelectedWeeks(
-      getWeeksByMonthAndYear(parseInt(currentYear), selectedMonth)
+    if (thisYearMonths.length === 0) return;
+
+    const stillOffered = thisYearMonths.some(
+      (month) => month.value === selectedMonth
     );
-  }, [currentYear, getWeeksByMonthAndYear, selectedMonth]);
+
+    if (stillOffered) return;
+
+    setSelectedMonth(preferredMonth(thisYearMonths));
+  }, [thisYearMonths, selectedMonth, preferredMonth]);
+
+  useEffect(() => {
+    setSelectedWeeks(getWeeksByMonth(selectedMonth));
+  }, [getWeeksByMonth, selectedMonth]);
 
   useEffect(() => {
     selectedWeeks.forEach((value, index) => {
       const schedule = schedules.find((record) => record.weekOf === value);
 
+      if (!schedule?.midweek_meeting) {
+        changeValueInArrayState(setWeeksTypes, index, { value: Week.NORMAL });
+        return;
+      }
+
       const weekType = schedule.midweek_meeting.week_type.find(
         (record) => record.type === dataView
-      );
+      ) || { value: Week.NORMAL };
 
       changeValueInArrayState(setWeeksTypes, index, weekType);
     });
@@ -251,22 +282,37 @@ const useMonthlyView = () => {
     selectedWeeks.forEach((value, index) => {
       const source = sources.find((record) => record.weekOf === value);
 
+      if (!source?.midweek_meeting) {
+        changeValueInArrayState(setAyfCount, index, 1);
+
+        ayfPartsSetters.forEach((setter) =>
+          changeValueInArrayState(setter, index, null)
+        );
+
+        isTalkAYFPartsSetters.forEach((setter) =>
+          changeValueInArrayState(setter, index, false)
+        );
+
+        return;
+      }
+
       changeValueInArrayState(
         setAyfCount,
         index,
-        source.midweek_meeting.ayf_count[lang]
+        source?.midweek_meeting?.ayf_count?.[lang] ?? DEFAULT_AYF_COUNT
       );
 
       ayfPartsSetters.forEach((setter, setterIndex) => {
-        const ayfPart = source.midweek_meeting[`ayf_part${setterIndex + 1}`];
+        const ayfPart = source?.midweek_meeting?.[`ayf_part${setterIndex + 1}`];
 
-        changeValueInArrayState(setter, index, ayfPart.type[lang]);
+        const partType = ayfPart?.type?.[lang] ?? AssignmentCode.MM_Discussion;
+        changeValueInArrayState(setter, index, partType);
 
-        if (ayfPart.type[lang] === AssignmentCode.MM_ExplainingBeliefs) {
+        if (partType === AssignmentCode.MM_ExplainingBeliefs) {
           changeValueInArrayState(
             isTalkAYFPartsSetters[setterIndex],
             index,
-            sourcesCheckAYFExplainBeliefsAssignment(ayfPart.src[lang], lang)
+            sourcesCheckAYFExplainBeliefsAssignment(ayfPart?.src?.[lang], lang)
           );
         }
       });
@@ -284,6 +330,20 @@ const useMonthlyView = () => {
     selectedWeeks.forEach((value, index) => {
       const source = sources.find((record) => record.weekOf === value);
 
+      // the material of a week can be filed without its midweek part
+      if (!source?.midweek_meeting) {
+        changeValueInArrayState(setLcCount, index, 1);
+        changeValueInArrayState(setCustomPartEnabled, index, false);
+        changeValueInArrayState(setHasCustomPart, index, false);
+        lcNoAssignPartsSetters.forEach((setter) =>
+          changeValueInArrayState(setter, index, false)
+        );
+        isOverwriteLCPartsSetters.forEach((setter) =>
+          changeValueInArrayState(setter, index, false)
+        );
+        changeValueInArrayState(setLcNoAssignParts3, index, false);
+        return;
+      }
       const lcCountOverride =
         source.midweek_meeting.lc_count.override.find(
           (record) => record.type === dataView
@@ -314,10 +374,19 @@ const useMonthlyView = () => {
 
         const lcSrcDefault =
           source.midweek_meeting[`lc_part${setterIndex + 1}`].title.default[
-          lang
+            lang
           ];
 
         const lcSrc = lcSrcOverride?.length > 0 ? lcSrcOverride : lcSrcDefault;
+
+        const lcDescOverride = lcSrcPart.desc.override.find(
+          (record) => record.type === dataView
+        )?.value;
+
+        const lcDescDefault = lcSrcPart.desc.default[lang];
+
+        const lcDesc =
+          lcDescOverride?.length > 0 ? lcDescOverride : lcDescDefault;
 
         if (setterIndex + 1 === 1 || setterIndex + 1 === 2) {
           changeValueInArrayState(
@@ -328,7 +397,7 @@ const useMonthlyView = () => {
         }
 
         if (lcSrc?.length > 0) {
-          const noAssign = sourcesCheckLCAssignments(lcSrc, lang);
+          const noAssign = sourcesCheckLCAssignments(lcSrc, lcDesc, lang);
           changeValueInArrayState(setter, index, noAssign);
         }
       });
@@ -338,8 +407,13 @@ const useMonthlyView = () => {
           (record) => record.type === dataView
         )?.value || '';
 
+      const lc3Desc =
+        source.midweek_meeting.lc_part3.desc.find(
+          (record) => record.type === dataView
+        )?.value || '';
+
       if (lc3Src.length > 0) {
-        const noAssign = sourcesCheckLCAssignments(lc3Src, lang);
+        const noAssign = sourcesCheckLCAssignments(lc3Src, lc3Desc, lang);
         changeValueInArrayState(setLcNoAssignParts3, index, noAssign);
       }
     });
@@ -347,6 +421,9 @@ const useMonthlyView = () => {
 
   const handleAddCustomLCPart = async (week: string) => {
     const source = sources.find((record) => record.weekOf === week);
+
+    if (!source) return;
+
     const lcCount = source.midweek_meeting.lc_count;
     const lcCountOverride = structuredClone(lcCount.override);
 
