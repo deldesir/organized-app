@@ -24,7 +24,6 @@ import {
   schedulesS89Data,
 } from '@services/app/schedules';
 import {
-  displayNameMeetingsEnableState,
   JWLangLocaleState,
   JWLangState,
   meetingExactDateState,
@@ -54,7 +53,6 @@ const useMidweekExport = (onClose: MidweekExportType['onClose']) => {
   const dataView = useAtomValue(userDataViewState);
   const lang = useAtomValue(JWLangState);
   const cong_name = useAtomValue(headerForScheduleState);
-  const displayNameEnabled = useAtomValue(displayNameMeetingsEnableState);
   const cookiesConsent = useAtomValue(cookiesConsentState);
   const sourceLocale = useAtomValue(JWLangLocaleState);
   const meetingExactDate = useAtomValue(meetingExactDateState);
@@ -161,7 +159,6 @@ const useMidweekExport = (onClose: MidweekExportType['onClose']) => {
           <TemplateS140AppNormal
             cong_name={cong_name}
             data={S140}
-            fullname={!displayNameEnabled}
             lang={sourceLocale}
           />
         )

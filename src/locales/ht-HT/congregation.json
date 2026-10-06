@@ -380,6 +380,7 @@
   "tr_congregationRequestRejectedDesc": "Kongregasyon <strong>{{ congregationNameAndNumber }}</strong> lan refize demann ou an pou gade lis oratè y ap voye yo. Si sa nesesè, ou ka kontakte yo pèsonèlman.",
   "tr_congregationAccessRevoke": "Retire aksè pou kongregasyon sa a",
   "tr_congregationAccessRevokeDesc": "Retire aksè ak lis oratè w yo pou kongregasyon <strong>{{ congregationName }}</strong> lan? Yo p ap ka wè l ankò, men ou ka pataje l avèk yo ankò pita si yo fè yon nouvo demann.",
+  "tr_withoutGroup": "Without a group",
   "tr_noGroupsYet": "Ou poko kreye okenn gwoup pou travay predikasyon an. Kreye yon gwoup anvan pou w kòmanse ajoute pwoklamatè epi reòganize gwoup yo.",
   "tr_coordinator": "Kòdonatè",
   "tr_secretary": "Sekretè",
