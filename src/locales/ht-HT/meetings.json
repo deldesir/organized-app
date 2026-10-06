@@ -3,7 +3,6 @@
   "tr_hall": "Sal",
   "tr_hallWithName": "Sal {{ name }}",
   "tr_export": "Ekspòte",
-  "tr_exportSelectRangeAndForm": "Select a week range and at least one form to export.",
   "tr_autofill": "Ranpli otomatikman",
   "tr_infoPlanMidweekMeeting": "Chwazi yon semèn pou w kòmanse ajoute asiyasyon epi modifye pati pwogram yo si sa nesesè. Ou ka itilize fonksyon Ranpli otomatikman an tou, epi Organized ap ranpli asiyasyon yo dapre kalifikasyon itilizatè yo.",
   "tr_infoSecondPlanMidweekMeeting": "Chwazi yon semèn pou w pwograme l manyèlman, oswa kite Organized jenere asiyasyon yo otomatikman ak fonksyon Ranpli otomatikman an, an konsiderasyon kalifikasyon moun nan ak asiyasyon li te genyen anvan yo. Ou ka modifye yo jan w vle.",
@@ -194,5 +193,6 @@
   "tr_meetingPortion": "Pòsyon reyinyon an",
   "tr_specialTalkOnly": "Diskou espesyal sèlman",
   "tr_hostCongregationShort": "Lakay",
-  "tr_outgoingSpeakersSchedule": "Pwogram oratè k ap soti yo"
+  "tr_outgoingSpeakersSchedule": "Pwogram oratè k ap soti yo",
+  "tr_exportSelectRangeAndForm": "Select a week range and at least one form to export."
 }
