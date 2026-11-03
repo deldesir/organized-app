@@ -25,6 +25,7 @@ import {
   hi,
   bg,
   he,
+  ht,
 } from 'date-fns/locale';
 import { AppRoleType, LanguageItem } from '@definition/app';
 import { AssignmentCode } from '@definition/assignment';
@@ -49,6 +50,20 @@ export const LANGUAGE_LIST: LanguageItem[] = [
     threeLettersCode: 'eng',
     browserLangCode: ['en-US', 'en-GB', 'en'],
     fnsLocale: enUS,
+  },
+  {
+    // `code` is the JW.org source-material symbol (uppercased when the app
+    // requests materials, e.g. GET /api/CR). Haitian Creole is "CR" on
+    // jw.org's pub-media API — not the ISO code "ht" — matching how English
+    // is "e"→E and French "f"→F. Using "ht" here made the source fetch hit
+    // /api/HT (404), so Creole materials silently never imported.
+    code: 'cr',
+    locale: 'ht-HT',
+    name: 'Kreyòl Ayisyen',
+    source: true,
+    threeLettersCode: 'hat',
+    browserLangCode: ['ht-HT', 'ht'],
+    fnsLocale: ht,
   },
   {
     code: 's',

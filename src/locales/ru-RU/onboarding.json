@@ -130,5 +130,7 @@
   "tr_loginWithEmailDesc": "Используй Google, Yahoo, или другую почту, чтобы создать и пользоваться твоим аккаунтом в любое время и на любом устройстве",
   "tr_loginWithCode": "Вход по коду приглашения",
   "tr_loginWithCodeDesc": "Доступ только в этом браузере с одноразовым кодом. Каждый раз нужен будет новый код",
-  "tr_loginEmailCode": "Или, ты можешь ввести защитный код, который мы отправили на твою электронную почту."
+  "tr_loginEmailCode": "Или, ты можешь ввести защитный код, который мы отправили на твою электронную почту.",
+  "tr_loginFailed": "Unable to sign in",
+  "tr_loginFailedDesc": "The username or password is incorrect, or the server could not be reached. Check them and try again."
 }

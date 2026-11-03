@@ -2,13 +2,17 @@ import { NotificationDbRecordType } from '@definition/notification';
 import { apiDefault } from './common';
 
 export const apiFetchNotifications = async () => {
-  const { appLang, roles } = await apiDefault();
+  const { appLang, roles, isOnline } = await apiDefault();
 
-  const isLive = location.hostname === 'organized-app.com';
+  // Self-hosted / offline-first: announcements come from a configurable
+  // endpoint instead of the hard-coded notifications.organized-app.com cloud
+  // service. When no endpoint is configured (or the box is offline), the
+  // feature is simply disabled — no third-party SaaS is contacted.
+  const url = import.meta.env.VITE_NOTIFICATIONS_API;
 
-  const url = isLive
-    ? 'https://notifications.organized-app.com'
-    : 'https://dev-notifications.organized-app.com';
+  if (!url || !isOnline) {
+    return [] as NotificationDbRecordType[];
+  }
 
   const res = await fetch(`${url}/${appLang}`, {
     method: 'GET',

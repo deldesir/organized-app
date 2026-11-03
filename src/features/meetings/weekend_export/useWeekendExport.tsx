@@ -17,6 +17,7 @@ import {
   schedulesWeekendData,
 } from '@services/app/schedules';
 import { JWLangLocaleState, userDataViewState } from '@states/settings';
+import { useAppTranslation } from '@hooks/index';
 import {
   TemplateOutgoingSpeakersSchedule,
   TemplateWeekendMeeting,
@@ -26,6 +27,7 @@ import { Week } from '@definition/week_type';
 import { WEEK_TYPE_NO_MEETING } from '@constants/index';
 
 const useWeekendExport = (onClose: WeekendExportType['onClose']) => {
+  const { t } = useAppTranslation();
   const schedules = useAtomValue(schedulesState);
   const dataView = useAtomValue(userDataViewState);
   const congName = useAtomValue(headerForScheduleState);
@@ -98,7 +100,20 @@ const useWeekendExport = (onClose: WeekendExportType['onClose']) => {
   };
 
   const handleExportSchedules = async () => {
-    if (startWeek.length === 0 || endWeek.length === 0) return;
+    // Silent early returns read as a dead button; tell the user what's missing.
+    if (
+      startWeek.length === 0 ||
+      endWeek.length === 0 ||
+      (!exportWeekendMeetingScheduleIsChecked &&
+        !exportOutgoingSpeakersScheduleIsChecked)
+    ) {
+      displaySnackNotification({
+        header: getMessageByCode('error_app_generic-title'),
+        message: t('tr_exportSelectRangeAndForm'),
+        severity: 'warning',
+      });
+      return;
+    }
 
     try {
       setIsProcessing(true);
@@ -122,6 +137,16 @@ const useWeekendExport = (onClose: WeekendExportType['onClose']) => {
 
         return isValid;
       });
+
+      if (weeksList.length === 0) {
+        setIsProcessing(false);
+        displaySnackNotification({
+          header: getMessageByCode('error_app_generic-title'),
+          message: t('tr_noMeetingWeek'),
+          severity: 'warning',
+        });
+        return;
+      }
 
       if (exportWeekendMeetingScheduleIsChecked) {
         await exportWeekendMeetingSchedule(weeksList);

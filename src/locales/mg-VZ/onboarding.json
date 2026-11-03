@@ -130,5 +130,7 @@
   "tr_loginWithEmailDesc": "Hampiasa kaonty Google, Yahoo, na adiresy email hafa mba hamoronana na hidirana amin’ny kaontinao, amin’ny fitaovana rehetra",
   "tr_loginWithCode": "Hampiasa kaody fanasana",
   "tr_loginWithCodeDesc": "Hampiasa kaody ka hiditra amin’ity programa fijerena internet ity ihany. Mila kaody vaovao ianao raha hiverina hiditra indray.",
-  "tr_loginEmailCode": "Azonao atao koa ny mampiditra eto ambany ny kaody izay nalefanay any amin’ny hafatrao."
+  "tr_loginEmailCode": "Azonao atao koa ny mampiditra eto ambany ny kaody izay nalefanay any amin’ny hafatrao.",
+  "tr_loginFailed": "Unable to sign in",
+  "tr_loginFailedDesc": "The username or password is incorrect, or the server could not be reached. Check them and try again."
 }

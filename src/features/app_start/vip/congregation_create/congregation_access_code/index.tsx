@@ -102,6 +102,11 @@ const CongregationAccessCode = () => {
               autoComplete="off"
               value={tmpAccessCodeVerify}
               onChange={(e) => setTmpAccessCodeVerify(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !btnActionDisabled) {
+                  handleSetAccessCode();
+                }
+              }}
               startIcon={<IconCongregationAccess color="var(--black)" />}
               resetHelperPadding={true}
               helperText={

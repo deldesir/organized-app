@@ -130,5 +130,7 @@
   "tr_loginWithEmailDesc": "Sử dụng Google, Yahoo hoặc email khác để tạo và sử dụng tài khoản của anh/chị bất cứ lúc nào, trên bất kỳ thiết bị nào",
   "tr_loginWithCode": "Đăng nhập bằng mã mời",
   "tr_loginWithCodeDesc": "Chỉ truy cập bằng mã một lần trong trình duyệt này. Anh/chị cần mã mới mỗi lần",
-  "tr_loginEmailCode": "Ngoài ra, anh/chị cũng có thể nhập mã bảo mật mà chúng tôi đã gửi tới email của anh/chị."
+  "tr_loginEmailCode": "Ngoài ra, anh/chị cũng có thể nhập mã bảo mật mà chúng tôi đã gửi tới email của anh/chị.",
+  "tr_loginFailed": "Unable to sign in",
+  "tr_loginFailedDesc": "The username or password is incorrect, or the server could not be reached. Check them and try again."
 }

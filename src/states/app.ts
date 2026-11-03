@@ -32,7 +32,7 @@ export const isAppLoadState = atom(true);
 
 export const isSetupState = atom(true);
 
-export const apiHostState = atom('');
+export const apiHostState = atom(import.meta.env.VITE_API_HOST || '/oa');
 
 export const isAboutOpenState = atom(false);
 

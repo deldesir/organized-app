@@ -130,5 +130,7 @@
   "tr_loginWithEmailDesc": "השתמש ב־Google, Yahoo או אימייל אחר כדי ליצור ולהשתמש בחשבון שלך בכל עת, בכל מכשיר",
   "tr_loginWithCode": "התחברות עם קוד הזמנה",
   "tr_loginWithCodeDesc": "גישה עם קוד חד־פעמי בדפדפן זה בלבד. תצטרך קוד חדש בכל פעם",
-  "tr_loginEmailCode": "לחלופין, תוכל גם להזין את הקוד המאובטח ששלחנו לאימייל שלך."
+  "tr_loginEmailCode": "לחלופין, תוכל גם להזין את הקוד המאובטח ששלחנו לאימייל שלך.",
+  "tr_loginFailed": "Unable to sign in",
+  "tr_loginFailedDesc": "The username or password is incorrect, or the server could not be reached. Check them and try again."
 }

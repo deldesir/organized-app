@@ -130,5 +130,7 @@
   "tr_loginWithEmailDesc": "Nutze Google, Yahoo oder eine andere E-Mail, um dein Konto jederzeit und auf jedem Gerät zu erstellen und zu nutzen",
   "tr_loginWithCode": "Einladungscode-Login",
   "tr_loginWithCodeDesc": "Zugang mit einem Einmalcode nur in diesem Browser. Du benötigst jedes Mal einen neuen Code",
-  "tr_loginEmailCode": "Alternativ kannst du auch den Sicherheitscode eingeben, den wir an deine E-Mail gesendet haben."
+  "tr_loginEmailCode": "Alternativ kannst du auch den Sicherheitscode eingeben, den wir an deine E-Mail gesendet haben.",
+  "tr_loginFailed": "Unable to sign in",
+  "tr_loginFailedDesc": "The username or password is incorrect, or the server could not be reached. Check them and try again."
 }

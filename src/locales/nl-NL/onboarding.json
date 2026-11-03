@@ -130,5 +130,7 @@
   "tr_loginWithEmailDesc": "Gebruik Google, Yahoo, of een andere e-mail om uw account op elk gewenst apparaat aan te maken en te gebruiken",
   "tr_loginWithCode": "Uitnodigingscode login",
   "tr_loginWithCodeDesc": "Alleen toegang tot deze browser met een eenmalige code. U heeft elke keer een nieuwe code nodig",
-  "tr_loginEmailCode": "Alternatively, you can also enter the secure code that we sent to your email."
+  "tr_loginEmailCode": "Alternatively, you can also enter the secure code that we sent to your email.",
+  "tr_loginFailed": "Unable to sign in",
+  "tr_loginFailedDesc": "The username or password is incorrect, or the server could not be reached. Check them and try again."
 }

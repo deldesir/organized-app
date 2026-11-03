@@ -44,6 +44,11 @@ const RequestAccess = () => {
           label={t('tr_lastname')}
           value={lastname}
           onChange={(e) => setLastname(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && congregation) {
+              handleRequestAccess();
+            }
+          }}
         />
       </Box>
 

@@ -15,7 +15,7 @@ const RootWrap = () => {
   return (
     <Provider store={store}>
       <ServiceWorkerWrapper
-        publicServiceWorkerDest="/service-worker.js"
+        publicServiceWorkerDest={`${import.meta.env.BASE_URL}service-worker.js`}
         onError={(err) => logger.error('app', `An error occured: ${err}`)}
         onInstalled={handleSWOnInstalled}
         onUpdated={handleSWOnUpdated}

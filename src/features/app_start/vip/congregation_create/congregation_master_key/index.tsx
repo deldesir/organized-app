@@ -116,6 +116,11 @@ const CongregationMasterKey = () => {
               autoComplete="off"
               value={tmpMasterKeyVerify}
               onChange={(e) => setTmpMasterKeyVerify(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !btnActionDisabled) {
+                  handleSetMasterKey();
+                }
+              }}
               startIcon={<IconEncryptionKey color="var(--black)" />}
               resetHelperPadding={true}
               helperText={

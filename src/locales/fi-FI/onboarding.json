@@ -130,5 +130,7 @@
   "tr_loginWithEmailDesc": "Googlen, Yahoon tai muun sähköpostin avulla voit luoda ja käyttää tiliäsi milloin tahansa, millä tahansa laitteella",
   "tr_loginWithCode": "Kutsukoodin kirjautuminen",
   "tr_loginWithCodeDesc": "Käytä vain tätä selainta kertakoodilla. Tarvitset uuden koodin joka kerta",
-  "tr_loginEmailCode": "Vaihtoehtoisesti voit myös syöttää turvakoodin, jonka lähetimme sähköpostiisi."
+  "tr_loginEmailCode": "Vaihtoehtoisesti voit myös syöttää turvakoodin, jonka lähetimme sähköpostiisi.",
+  "tr_loginFailed": "Unable to sign in",
+  "tr_loginFailedDesc": "The username or password is incorrect, or the server could not be reached. Check them and try again."
 }

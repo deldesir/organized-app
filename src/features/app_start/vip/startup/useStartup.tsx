@@ -29,6 +29,7 @@ import {
 } from '@states/settings';
 import { APP_ROLES, VIP_ROLES } from '@constants/index';
 import { handleDeleteDatabase, loadApp, runUpdater } from '@services/app';
+import { dbAppSettingsUpdateWithoutNotice } from '@services/dexie/settings';
 import { apiValidateMe } from '@services/api/user';
 import { dbAppSettingsUpdate } from '@services/dexie/settings';
 import { userSignOut } from '@services/firebase/auth';
@@ -81,11 +82,27 @@ const useStartup = () => {
       }
 
       if (congName.length === 0) {
+        // Right after a local sign-in, the profile is written to the local DB
+        // and the page reloads. The settings live-query hydrates congName a
+        // moment after this check first runs (cookiesConsent initializes
+        // synchronously from localStorage, so this effect fires before the DB
+        // resolves). Without this guard we'd bounce straight back to sign-in
+        // and never recover, because this check is one-shot via isStart. While
+        // the just-signed-in flag is set, stay in the loading state and let the
+        // effect re-run when congName populates (congName is a dep of
+        // runStartupCheck), instead of bouncing.
+        if (localStorage.getItem('justLoggedIn') === '1') {
+          setIsLoading(true);
+          return;
+        }
         setIsLoading(false);
         setIsStart(false);
         showSignin();
         return;
       }
+
+      // congName is hydrated — the post-sign-in wait (if any) is over.
+      localStorage.removeItem('justLoggedIn');
 
       const approvedRole = congRole.some((role) => APP_ROLES.includes(role));
       const masterKeyNeeded = congRole.some((role) => VIP_ROLES.includes(role));
@@ -116,6 +133,15 @@ const useStartup = () => {
       }
 
       const { status, result } = await apiValidateMe();
+
+      // Backfill the local congregation id if it's missing (e.g. signed in
+      // before login() persisted it). The admin onboarding endpoints build
+      // congregations/admin/<cong_id>/... — an empty id 404s as admin//... .
+      if (status === 200 && result?.cong_id && congID.length === 0) {
+        await dbAppSettingsUpdateWithoutNotice({
+          'cong_settings.cong_id': result.cong_id,
+        });
+      }
 
       if (isUserAccountCreated) {
         setIsLoading(false);

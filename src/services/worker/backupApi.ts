@@ -11,7 +11,7 @@ export const apiGetCongregationBackup = async ({
   idToken: string;
   metadata: string;
 }) => {
-  const res = await fetch(`${apiHost}api/v3/users/${userID}/backup`, {
+  const res = await fetch(`${apiHost}/api/v3/users/${userID}/backup`, {
     method: 'GET',
     credentials: 'include',
     headers: {
@@ -60,16 +60,19 @@ export const apiSendCongregationBackup = async ({
 export const apiGetPocketBackup = async ({
   apiHost,
   metadata,
+  idToken,
 }: {
   apiHost: string;
   metadata: string;
+  idToken: string;
 }) => {
-  const res = await fetch(`${apiHost}api/v3/pockets/backup`, {
+  const res = await fetch(`${apiHost}/api/v3/pockets/backup`, {
     method: 'GET',
     credentials: 'include',
     headers: {
       'Content-Type': 'application/json',
       'Cache-Control': 'no-cache',
+      Authorization: `Bearer ${idToken}`,
       appclient: 'organized',
       appversion: import.meta.env.PACKAGE_VERSION,
       metadata,
@@ -89,13 +92,20 @@ export const apiSendPocketBackup = async ({
   apiHost,
   reqPayload,
   metadata,
+  idToken,
+}: {
+  apiHost: string;
+  reqPayload: object;
+  metadata: string;
+  idToken: string;
 }) => {
-  const res = await fetch(`${apiHost}api/v3/pockets/backup`, {
+  const res = await fetch(`${apiHost}/api/v3/pockets/backup`, {
     method: 'POST',
     credentials: 'include',
     headers: {
       'Content-Type': 'application/json',
       'Cache-Control': 'no-cache',
+      Authorization: `Bearer ${idToken}`,
       appclient: 'organized',
       appversion: import.meta.env.PACKAGE_VERSION,
       metadata,
@@ -132,7 +142,7 @@ export const apiSendCongregationBackupChunk = async ({
   for (let i = 0; i < totalChunks; i++) {
     const chunkData = jsonStr.slice(i * CHUNK_SIZE, (i + 1) * CHUNK_SIZE);
 
-    const res = await fetch(`${apiHost}api/v3/users/${userID}/backup/chunked`, {
+    const res = await fetch(`${apiHost}/api/v3/users/${userID}/backup/chunked`, {
       method: 'POST',
       credentials: 'include',
       headers: {

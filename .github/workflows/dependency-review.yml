@@ -8,6 +8,11 @@ permissions:
 jobs:
   dependency-review:
     runs-on: ubuntu-latest
+    # The dependency-review action needs GitHub's Dependency Graph enabled,
+    # which is not available on this fork — it errors out and fails the PR.
+    # Restrict it to upstream so it simply skips here (enable Dependency Graph
+    # in repo Settings → Code security and analysis to run it on the fork).
+    if: github.repository == 'sws2apps/organized-app'
 
     steps:
       - name: Checkout for dependency review
